@@ -1,0 +1,17 @@
+{
+  "name": "zhiyanglee/lego-kit",
+  "description": "play well",
+  "minimum-stability": "stable",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "zhiyanglee",
+      "email": "zhiyanglee@foxmail.com"
+    }
+  ],
+  "autoload" : {
+    "psr-4" : {
+      "ZhiYangLee\\Lego\\" : "src/"
+    }
+  }
+}
