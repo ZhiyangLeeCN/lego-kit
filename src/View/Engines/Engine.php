@@ -1,8 +1,13 @@
 <?php namespace ZhiYangLee\Lego\View\Engines;
 
 /**
+ *  copy form Laravel View
+ *
+ *  https://github.com/laravel/framework/blob/5.4/src/Illuminate/View/Engines/EngineInterface.php
+ *
  * @author zhiyanglee<zhiyanglee@foxmail.com>
  * @date 2017/3/6
+ *
  */
 
 
