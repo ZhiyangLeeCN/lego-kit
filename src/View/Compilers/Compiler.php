@@ -14,6 +14,13 @@
 interface Compiler
 {
     /**
+     *  Get compiler name
+     *
+     * @return string
+     */
+    public function getCompilerName();
+
+    /**
      * Get the path to the compiled version of a view.
      *
      * @param  string  $path

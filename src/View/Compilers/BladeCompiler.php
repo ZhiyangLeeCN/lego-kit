@@ -92,6 +92,16 @@ class BladeCompiler extends AbstractCompiler implements Compiler
     protected $forelseCounter = 0;
 
     /**
+     *  Get compiler name
+     *
+     * @return string
+     */
+    public function getCompilerName()
+    {
+        return 'blade';
+    }
+
+    /**
      * Compile the view at the given path.
      *
      * @param  string $path
@@ -103,11 +113,21 @@ class BladeCompiler extends AbstractCompiler implements Compiler
 
         $result = '';
 
+        $this->footer = [];
+
         // Here we will loop through all of the tokens returned by the Zend lexer and
         // parse each one into the corresponding valid PHP. We will then have this
         // template as the correctly rendered PHP that can be rendered natively.
         foreach (token_get_all($content) as $token) {
             $result .= is_array($token) ? $this->parseToken($token) : $token;
+        }
+
+        // If there are any footer lines that need to get added to a template we will
+        // add them here at the end of the template. This gets used mainly for the
+        // template inheritance via the extends keyword that should be appended.
+        if (count($this->footer) > 0) {
+            $result = ltrim($result, PHP_EOL)
+                .PHP_EOL.implode(PHP_EOL, array_reverse($this->footer));
         }
 
         if (! is_null($this->cachePath)) {
@@ -642,6 +662,25 @@ class BladeCompiler extends AbstractCompiler implements Compiler
     }
 
     /**
+     * Compile the extends statements into valid PHP.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function compileExtends($expression)
+    {
+        if (starts_with($expression, '(')) {
+            $expression = substr($expression, 1, -1);
+        }
+
+        $data = "<?php echo \$__env->make($expression, array_except(get_defined_vars(), array('__data', '__path'))); ?>";
+
+        $this->footer[] = $data;
+
+        return '';
+    }
+
+    /**
      * Compile the include statements into valid PHP.
      *
      * @param  string  $expression
@@ -649,11 +688,11 @@ class BladeCompiler extends AbstractCompiler implements Compiler
      */
     protected function compileInclude($expression)
     {
-        if (Str::startsWith($expression, '(')) {
+        if (starts_with($expression, '(')) {
             $expression = substr($expression, 1, -1);
         }
 
-        return "<?php echo \$__env->make($expression, array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>";
+        return "<?php echo \$__env->make($expression, array_except(get_defined_vars(), array('__data', '__path'))); ?>";
     }
 
     /**
@@ -712,5 +751,4 @@ class BladeCompiler extends AbstractCompiler implements Compiler
     {
         $this->customDirectives[$name] = $handler;
     }
-
 }

@@ -40,6 +40,20 @@ class Factory
      */
     protected $shared = [];
 
+    /**
+     * All of the finished, captured sections.
+     *
+     * @var array
+     */
+    protected $sections = [];
+
+    /**
+     * The stack of in-progress sections.
+     *
+     * @var array
+     */
+    protected $sectionStack = [];
+
     public function __construct($viewsPath, Engine $engine, Compiler $compiler = null)
     {
         $this->viewsPath = $viewsPath;
@@ -103,14 +117,24 @@ class Factory
     }
 
     /**
-     *  获取视图名称
+     *  获取视图文件路径名称
      *
      * @param  string $view
      * @return string
      */
     protected function getViewPath($view)
     {
-        return $this->viewsPath . '/' . $view . '.blade.php';
+        if (is_null($this->compiler)) {
+
+            return $this->viewsPath . '/' . $view . '.php';
+
+        } else {
+
+            return $this->viewsPath . '/' . $view
+                . '.' . $this->compiler->getCompilerName() . '.php';
+
+        }
+
     }
 
     /**
@@ -121,15 +145,166 @@ class Factory
      */
     protected function normalizeName($name)
     {
-        $delimiter = self::HINT_PATH_DELIMITER;
+        return str_replace('.', '/', $name);
+    }
 
-        if (strpos($name, $delimiter) === false) {
-            return str_replace('/', '.', $name);
+    /**
+     * Get the rendered contents of a partial from a loop.
+     *
+     * @param  string  $view
+     * @param  array   $data
+     * @param  string  $iterator
+     * @param  string  $empty
+     * @return string
+     */
+    public function renderEach($view, $data, $iterator, $empty = 'raw|')
+    {
+        $result = '';
+
+        // If is actually data in the array, we will loop through the data and append
+        // an instance of the partial view to the final result HTML passing in the
+        // iterated value of this data array, allowing the views to access them.
+        if (count($data) > 0)
+        {
+            foreach ($data as $key => $value)
+            {
+                $data = array('key' => $key, $iterator => $value);
+
+                $result .= $this->make($view, $data);
+            }
         }
 
-        list($namespace, $name) = explode($delimiter, $name);
+        // If there is no data in the array, we will render the contents of the empty
+        // view. Alternatively, the "empty view" could be a raw string that begins
+        // with "raw|" for convenience and to let this know that it is a string.
+        else
+        {
+            if (starts_with($empty, 'raw|'))
+            {
+                $result = substr($empty, 4);
+            }
+            else
+            {
+                $result = $this->make($empty);
+            }
+        }
 
-        return $namespace.$delimiter.str_replace('/', '.', $name);
+        return $result;
+    }
+
+    /**
+     * Get the string contents of a section.
+     *
+     * @param  string  $section
+     * @param  string  $default
+     * @return string
+     */
+    public function yieldContent($section, $default = '')
+    {
+        $sectionContent = $default;
+
+        if (isset($this->sections[$section]))
+        {
+            $sectionContent = $this->sections[$section];
+        }
+
+        $sectionContent = str_replace('@@parent', '--parent--holder--', $sectionContent);
+
+        return str_replace(
+            '--parent--holder--', '@parent', str_replace('@parent', '', $sectionContent)
+        );
+    }
+
+    /**
+     * Stop injecting content into a section and return its contents.
+     *
+     * @return string
+     */
+    public function yieldSection()
+    {
+        return $this->yieldContent($this->stopSection());
+    }
+
+    /**
+     * Stop injecting content into a section.
+     *
+     * @param  bool  $overwrite
+     * @return string
+     */
+    public function stopSection($overwrite = false)
+    {
+        $last = array_pop($this->sectionStack);
+
+        if ($overwrite)
+        {
+            $this->sections[$last] = ob_get_clean();
+        }
+        else
+        {
+            $this->extendSection($last, ob_get_clean());
+        }
+
+        return $last;
+    }
+
+    /**
+     * Append content to a given section.
+     *
+     * @param  string  $section
+     * @param  string  $content
+     * @return void
+     */
+    protected function extendSection($section, $content)
+    {
+        if (isset($this->sections[$section]))
+        {
+            $content = str_replace('@parent', $content, $this->sections[$section]);
+        }
+
+        $this->sections[$section] = $content;
+    }
+
+    /**
+     * Start injecting content into a section.
+     *
+     * @param  string  $section
+     * @param  string  $content
+     * @return void
+     */
+    public function startSection($section, $content = '')
+    {
+        if ($content === '')
+        {
+            if (ob_start())
+            {
+                $this->sectionStack[] = $section;
+            }
+        }
+        else
+        {
+            $this->extendSection($section, $content);
+        }
+    }
+
+    /**
+     * Stop injecting content into a section and append it.
+     *
+     * @return string
+     */
+    public function appendSection()
+    {
+        $last = array_pop($this->sectionStack);
+
+        if (isset($this->sections[$last]))
+        {
+            $this->sections[$last] .= ob_get_clean();
+        }
+        else
+        {
+            $this->sections[$last] = ob_get_clean();
+        }
+
+        return $last;
     }
 
 }

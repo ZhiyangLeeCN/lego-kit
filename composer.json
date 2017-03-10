@@ -12,6 +12,15 @@
   "autoload" : {
     "psr-4" : {
       "ZhiYangLee\\Lego\\" : "src/"
+    },
+    "files" : [
+      "src/View/Helper/functions.php"
+    ]
+  },
+  "repositories": {
+    "packagist": {
+      "type": "composer",
+      "url": "https://packagist.phpcomposer.com"
     }
   }
 }
