@@ -1,5 +1,15 @@
 <?php namespace ZhiYangLee\Lego\Support;
 
+/**
+ * copy form Laravel Support
+ *
+ * https://github.com/laravel/framework/blob/5.4/src/Illuminate/Support/Collection.php
+ *
+ * @author zhiyanglee<zhiyanglee@foxmail.com>
+ * @date 2017/3/15
+ *
+ */
+
 use Countable;
 use ArrayAccess;
 use ArrayIterator;
