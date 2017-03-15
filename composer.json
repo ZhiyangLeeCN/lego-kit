@@ -14,7 +14,7 @@
       "ZhiYangLee\\Lego\\" : "src/"
     },
     "files" : [
-      "src/View/Helper/functions.php"
+      "src/Support/helpers.php"
     ]
   },
   "repositories": {
