@@ -11,7 +11,6 @@
  */
 
 use RuntimeException;
-use ZhiYangLee\Lego\Support\Traits\Macroable;
 
 class Str
 {

@@ -9,7 +9,6 @@ use IteratorAggregate;
 use InvalidArgumentException;
 use ZhiYangLee\Lego\Support\Contracts\Arrayable;
 use ZhiYangLee\Lego\Support\Contracts\Jsonable;
-use ZhiYangLee\Lego\Support\Traits\Macroable;
 
 class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate, Jsonable, JsonSerializable
 {
