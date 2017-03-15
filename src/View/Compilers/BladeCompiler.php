@@ -673,7 +673,7 @@ class BladeCompiler extends AbstractCompiler implements Compiler
             $expression = substr($expression, 1, -1);
         }
 
-        $data = "<?php echo \$__env->make($expression, array_except(get_defined_vars(), array('__data', '__path'))); ?>";
+        $data = "<?php echo \$__env->render($expression, array_except(get_defined_vars(), array('__data', '__path'))); ?>";
 
         $this->footer[] = $data;
 
@@ -692,7 +692,7 @@ class BladeCompiler extends AbstractCompiler implements Compiler
             $expression = substr($expression, 1, -1);
         }
 
-        return "<?php echo \$__env->make($expression, array_except(get_defined_vars(), array('__data', '__path'))); ?>";
+        return "<?php echo \$__env->render($expression, array_except(get_defined_vars(), array('__data', '__path'))); ?>";
     }
 
     /**

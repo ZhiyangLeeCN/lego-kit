@@ -13,7 +13,6 @@ use ZhiYangLee\Lego\Support\Traits\Macroable;
 
 class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate, Jsonable, JsonSerializable
 {
-    use Macroable;
 
     /**
      * The items contained in the collection.

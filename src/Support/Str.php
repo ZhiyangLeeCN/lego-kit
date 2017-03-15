@@ -15,7 +15,6 @@ use ZhiYangLee\Lego\Support\Traits\Macroable;
 
 class Str
 {
-    use Macroable;
 
     /**
      * The cache of snake-cased words.

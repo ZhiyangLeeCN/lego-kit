@@ -10,7 +10,7 @@ use ZhiYangLee\Lego\Support\Contracts\Arrayable;
 use ZhiYangLee\Lego\View\Compilers\Compiler;
 use ZhiYangLee\Lego\View\Engines\Engine;
 
-class Factory
+class View
 {
     /**
      * Hint path delimiter value.
@@ -90,7 +90,7 @@ class Factory
      * @param  array   $mergeData
      * @return string
      */
-    public function make($view, $data = [], $mergeData = [])
+    public function render($view, $data = [], $mergeData = [])
     {
         $view = $this->normalizeName($view);
 
@@ -182,7 +182,7 @@ class Factory
             {
                 $data = array('key' => $key, $iterator => $value);
 
-                $result .= $this->make($view, $data);
+                $result .= $this->render($view, $data);
             }
         }
 
@@ -197,7 +197,7 @@ class Factory
             }
             else
             {
-                $result = $this->make($empty);
+                $result = $this->render($empty);
             }
         }
 

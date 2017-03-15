@@ -11,11 +11,9 @@
  */
 
 use ArrayAccess;
-use ZhiYangLee\Lego\Support\Traits\Macroable;
 
 class Arr
 {
-    use Macroable;
 
     /**
      * Determine whether the given value is array accessible.
