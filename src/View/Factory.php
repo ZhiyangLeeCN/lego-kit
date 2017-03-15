@@ -6,6 +6,7 @@
  */
 
 use InvalidArgumentException;
+use ZhiYangLee\Lego\Support\Contracts\Arrayable;
 use ZhiYangLee\Lego\View\Compilers\Compiler;
 use ZhiYangLee\Lego\View\Engines\Engine;
 
@@ -95,7 +96,7 @@ class Factory
 
         $path = $this->getViewPath($view);
 
-        $data = array_merge($mergeData, $data, $this->shared);
+        $data = array_merge($mergeData, $this->parseData($data), $this->shared);
 
         if (!file_exists($path)) {
 
@@ -114,6 +115,17 @@ class Factory
         }
 
         return $this->engine->get($path, $data);
+    }
+
+    /**
+     * Parse the given data into a raw array.
+     *
+     * @param  mixed  $data
+     * @return array
+     */
+    protected function parseData($data)
+    {
+        return $data instanceof Arrayable ? $data->toArray() : $data;
     }
 
     /**
